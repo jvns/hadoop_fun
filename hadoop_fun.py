@@ -1,14 +1,17 @@
 import snakebite.client as client
 import snakebite.protobuf.ClientNamenodeProtocol_pb2 as client_proto
 from snakebite.channel import DataXceiverChannel
+import Queue
 
 
-cl = client.Client("10.165.43.39", port=9000)
 #client._get_dir_listing('/')
 #cl.cat('/wikipedia')
 #list(cl.ls(['/']))
 
-def do_thing_with_block(block):
+def create_client():
+    return client.Client("10.165.43.39", port=9000)
+
+def read_block(block):
     location = block.locs[0]
     host = location.id.ipAddr
     port = int(location.id.xferPort)
@@ -18,8 +21,20 @@ def do_thing_with_block(block):
     offset_in_block = 0
     check_crc = False
     length = block.b.numBytes
-    load = data_xciever.readBlock(length, block.b.poolId, block.b.blockId, block.b.generationStamp, offset_in_block, check_crc)
-    return load
+    block_gen = data_xciever.readBlock(length, block.b.poolId, block.b.blockId, block.b.generationStamp, offset_in_block, check_crc)
+    return block_gen
+
+
+def find_blocks(client, path):
+    fileinfo = client._get_file_info(path)
+    node = fileinfo.fs
+    length = node.length
+    request = client_proto.GetBlockLocationsRequestProto()
+    request.src = path
+    request.length = length
+    request.offset = 0L
+    response = client.service.getBlockLocations(request)
+    return list(response.locations.blocks)
 
 
 def find_out_things(client, path, tail_only=False, check_crc=False):
