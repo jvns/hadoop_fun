@@ -9,7 +9,11 @@ import Queue
 #list(cl.ls(['/']))
 
 def create_client():
-    return client.Client("10.165.43.39", port=9000)
+    return client.Client("10.80.255.239", port=9000)
+
+def get_locations(blocks):
+    return set(loc.id.ipAddr for block in blocks for loc in block.locs)
+
 
 def read_block(block):
     location = block.locs[0]
