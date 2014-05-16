@@ -6,17 +6,26 @@ import (
     "fmt"
     "os"
     "syscall"
+    "encoding/json"
     "net/http"
 )
-func sumBytesHandler(w http.ResponseWriter, r *http.Request) {
-    //buffer, _, err := GetFileBuffer(os.Args[1]);
-    //if err != nil {
-    //    panic(err)
-    //}
-    //result := sumBytes(buffer)
-    //fmt.Println(result)
 
-    fmt.Fprintf(w, "Hi there, I love %s!\n", r.URL.Path[1:])
+func sumBytesHandler(w http.ResponseWriter, req *http.Request) {
+    var request_map map[string]string
+    dec := json.NewDecoder(req.Body)
+    err := dec.Decode(&request_map)
+    if err != nil {
+        fmt.Fprintf(w, "Oh no, problem decoding!\n")
+        return
+    }
+    filename := request_map["filename"]
+    buffer, _, err := GetFileBuffer(filename);
+    if err != nil {
+        fmt.Fprintf(w, "Oh no, %s doesn't exist!\n", filename)
+        return
+    }
+    sum := sumBytes(buffer)
+    fmt.Fprintf(w, "The sum is %d\n", sum)
 }
 
 func main() {
