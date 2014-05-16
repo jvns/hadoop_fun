@@ -12,7 +12,11 @@ def get_bytesum_request(ip, port, filename):
     print r.text
 
 def remote_filename(block):
-    pass
+    pool_id = block.b.poolId
+    block_id = block.b.blockId
+    return "/mnt/var/lib/hadoop/dfs/current/{pool_id}/current/finalized/blk-{block_id}".format(pool_id=pool_id,
+            block_id=block_id)
+
 
 if __name__ == "__main__":
     filename = sys.argv[1]
@@ -21,4 +25,6 @@ if __name__ == "__main__":
     for block in blocks:
         location = block.locs[0]
         host = location.id.ipAddr
-        get_bytesum_request(host, 8080, filename)
+        print "Host:", host
+        remote_file = remote_filename(block)
+        get_bytesum_request(host, 8080, remote_file)
