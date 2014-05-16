@@ -8,8 +8,25 @@ import (
     "syscall"
     "encoding/json"
     "net/http"
+    "path/filepath"
 )
 
+func findFile(poolID string, blockID string) string {
+    prefix := "/mnt/var/lib/hadoop/dfs/current"
+    basePath := fmt.Sprintf("%s/%s/current/finalized/blk_%s",
+        prefix, poolID, blockID)
+    _, err := os.Open(basePath)
+    if err == nil {
+        return basePath
+    }
+    subPath := fmt.Sprintf("%s/%s/current/finalized/*/blk_%s",
+        prefix, poolID, blockID)
+    matches, err := filepath.Glob(subPath)
+    if err != nil {
+        panic(err)
+    }
+    return matches[0]
+}
 func sumBytesHandler(w http.ResponseWriter, req *http.Request) {
     var request_map map[string]string
     dec := json.NewDecoder(req.Body)
@@ -18,7 +35,7 @@ func sumBytesHandler(w http.ResponseWriter, req *http.Request) {
         fmt.Fprintf(w, "Oh no, problem decoding!\n")
         return
     }
-    filename := request_map["filename"]
+    filename := findFile(request_map["pool_id"], request_map["block_id"])
     buffer, _, err := GetFileBuffer(filename);
     if err != nil {
         fmt.Fprintf(w, "Oh no, %s doesn't exist!\n", filename)
