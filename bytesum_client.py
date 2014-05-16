@@ -4,17 +4,15 @@ import json
 import requests
 import sys
 
-def get_bytesum_request(ip, port, filename):
+def get_bytesum_request(ip, port, pool_id, block_id):
     url = "http://{url}:{port}".format(url=ip,port=port)
-    payload = {"filename" : filename}
+    payload = {"pool_id" : pool_id, "block_id": block_id}
     headers = {'content-type': 'application/json'}
     r = requests.post(url, data=json.dumps(payload), headers=headers)
     print r.text
 
 def remote_filename(block):
-    pool_id = block.b.poolId
-    block_id = block.b.blockId
-    return "/mnt/var/lib/hadoop/dfs/current/{pool_id}/current/finalized/blk-{block_id}".format(pool_id=pool_id,
+    return "/mnt/var/lib/hadoop/dfs/current/{pool_id}/current/finalized/blk_{block_id}".format(pool_id=pool_id,
             block_id=block_id)
 
 
@@ -25,6 +23,6 @@ if __name__ == "__main__":
     for block in blocks:
         location = block.locs[0]
         host = location.id.ipAddr
-        print "Host:", host
-        remote_file = remote_filename(block)
-        get_bytesum_request(host, 8080, remote_file)
+        pool_id = block.b.poolId
+        block_id = block.b.blockId
+        get_bytesum_request(host, 8080, pool_id, block_id)
