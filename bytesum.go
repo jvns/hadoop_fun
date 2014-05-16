@@ -28,6 +28,7 @@ func findFile(poolID string, blockID string) string {
     return matches[0]
 }
 func sumBytesHandler(w http.ResponseWriter, req *http.Request) {
+    w.Header().Set("Content-Type", "text/plain")
     var request_map map[string]string
     dec := json.NewDecoder(req.Body)
     err := dec.Decode(&request_map)
