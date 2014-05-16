@@ -2,17 +2,27 @@
 // Click here and start typing.
 package main
 
-import "fmt"
-import "os"
-import "syscall"
+import (
+    "fmt"
+    "os"
+    "syscall"
+    "net/http"
+)
+func sumBytesHandler(w http.ResponseWriter, r *http.Request) {
+    //buffer, _, err := GetFileBuffer(os.Args[1]);
+    //if err != nil {
+    //    panic(err)
+    //}
+    //result := sumBytes(buffer)
+    //fmt.Println(result)
+
+    fmt.Fprintf(w, "Hi there, I love %s!\n", r.URL.Path[1:])
+}
 
 func main() {
-    buffer, _, err := GetFileBuffer(os.Args[1]);
-    if err != nil {
-        panic(err)
-    }
-    result := sumBytes(buffer)
-    fmt.Println(result)
+    fmt.Println("Listening on port 8080!")
+    http.HandleFunc("/",sumBytesHandler)
+    http.ListenAndServe(":8080", nil)
 }
 
 func sumBytes(data []byte) uint8 {
