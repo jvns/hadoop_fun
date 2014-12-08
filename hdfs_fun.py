@@ -8,8 +8,8 @@ import Queue
 #cl.cat('/wikipedia')
 #list(cl.ls(['/']))
 
-def create_client():
-    return client.Client("10.80.255.239", port=9000)
+def create_client(hostname, port):
+    return client.Client(hostname, port=port)
 
 def get_locations(blocks):
     return set(loc.id.ipAddr for block in blocks for loc in block.locs)
