@@ -7,10 +7,6 @@ from snakebite.channel import DataXceiverChannel
 import Queue
 
 
-#client._get_dir_listing('/')
-#cl.cat('/wikipedia')
-#list(cl.ls(['/']))
-
 class HDFSFun(object):
     def __init__(self):
         self.client = self.create_client()
@@ -22,6 +18,13 @@ class HDFSFun(object):
 	config = configs[0]
 	namenode, port = config['namenode'], config['port']
         return client.Client(namenode, port=port)
+
+    @staticmethod
+    def print_blocks(blocks):
+        fmt = "%20s | %10s | %10s"
+        print fmt % ("Pool ID", "Bytes", "Block ID")
+        for block in blocks:
+            print fmt % (block.b.poolId, str(block.b.numBytes), str(block.b.blockId))
 
     def find_blocks(self, path):
         client = self.client
