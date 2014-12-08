@@ -19,11 +19,9 @@ class HDFSFun(object):
     def create_client():
         configs = HDFSConfig.get_external_config()
         namenodes = []
-        if configs:
-            for config in configs:
-                nn = Namenode(config['namenode'], config['port'])
-                namenodes.append(nn)
-        return client.Client(namenodes)
+	config = configs[0]
+	namenode, port = config['namenode'], config['port']
+        return client.Client(namenode, port=port)
 
     def find_blocks(self, path):
         client = self.client
