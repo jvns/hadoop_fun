@@ -26,11 +26,12 @@ class HDFSFun(object):
 
     def print_blocks(self, blocks):
         print "Pool:", set(block.b.poolId for block in blocks)
-        fmt = "%10s | %10s | %10s | %15s"
-        print fmt % ("Bytes", "Block ID", "# Locations", "First hostname")
+        fmt = "%10s | %10s | %11s | %15s"
+        print fmt % ("Bytes", "Block ID", "# Locations", "Hostnames")
         for block in blocks:
             num_bytes, block_id = str(block.b.numBytes), str(block.b.blockId)
-            print fmt % (num_bytes, block_id, len(block.locs), block.locs[0].id.hostName.split('.')[0])
+            hostnames = [loc.id.hostName.split('.')[0] for loc in block.locs]
+            print fmt % (num_bytes, block_id, len(block.locs), ','.join(hostnames))
 
     def find_blocks(self, path):
         client = self.client
