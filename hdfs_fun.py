@@ -12,6 +12,11 @@ class HDFSFun(object):
         self.client = self.create_client()
 
     @staticmethod
+    def fields(proto):
+        """Helper function to list protocol buffer fields"""
+        return [x[0].name for x in proto.ListFields()]
+
+    @staticmethod
     def create_client():
         configs = HDFSConfig.get_external_config()
         namenodes = []
@@ -19,12 +24,13 @@ class HDFSFun(object):
 	namenode, port = config['namenode'], config['port']
         return client.Client(namenode, port=port)
 
-    @staticmethod
-    def print_blocks(blocks):
-        fmt = "%20s | %10s | %10s"
-        print fmt % ("Pool ID", "Bytes", "Block ID")
+    def print_blocks(self, blocks):
+        print "Pool:", set(block.b.poolId for block in blocks)
+        fmt = "%10s | %10s | %10s | %15s"
+        print fmt % ("Bytes", "Block ID", "# Locations", "First hostname")
         for block in blocks:
-            print fmt % (block.b.poolId, str(block.b.numBytes), str(block.b.blockId))
+            num_bytes, block_id = str(block.b.numBytes), str(block.b.blockId)
+            print fmt % (num_bytes, block_id, len(block.locs), block.locs[0].id.hostName.split('.')[0])
 
     def find_blocks(self, path):
         client = self.client
