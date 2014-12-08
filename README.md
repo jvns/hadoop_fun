@@ -1,7 +1,7 @@
 hadoop_fun
 ==========
 
-Some Python code to help you have fun with Hadoop. Unmaintained.
+Some Python code to help you have fun with Hadoop. Unmaintained. If you `pip install snakebite` it's possible that this code will work for you too!
 
 Example code:
 
